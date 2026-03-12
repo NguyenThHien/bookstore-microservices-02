@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Trạng thái đơn hàng - BookStore{% endblock %}
+{% block content %}
+
+<a href="{% url 'orders' %}" class="back-link">← Đơn hàng của tôi</a>
+
+<div class="order-hero">
+    <div class="order-hero-inner">
+        <div class="order-hero-title">Đơn hàng #{{ order.id|default:"—" }}</div>
+        {% if order %}<div class="order-hero-sub">Theo dõi trạng thái, thanh toán và vận chuyển của đơn hàng.</div>{% endif %}
+    </div>
+</div>
+
+{% if order %}
+<div class="order-detail-grid">
+    <div class="order-timeline card">
+        <div class="order-card-title">Trạng thái</div>
+        <div class="timeline">
+            <div class="timeline-item {% if order.status == 'pending' %}active{% endif %}">
+                <div class="dot"></div>
+                <div class="timeline-content">
+                    <div class="label">Chờ xác nhận</div>
+                    <div class="meta">Đơn hàng đã được tạo</div>
+                </div>
+            </div>
+            <div class="timeline-item {% if order.status == 'confirmed' %}active{% endif %}">
+                <div class="dot"></div>
+                <div class="timeline-content">
+                    <div class="label">Đã xác nhận</div>
+                    <div class="meta">Thanh toán được xử lý</div>
+                </div>
+            </div>
+            <div class="timeline-item {% if order.status == 'shipped' %}active{% endif %}">
+                <div class="dot"></div>
+                <div class="timeline-content">
+                    <div class="label">Đang giao</div>
+                    <div class="meta">Đơn hàng đang trên đường</div>
+                </div>
+            </div>
+            <div class="timeline-item {% if order.status == 'delivered' %}active{% endif %}">
+                <div class="dot"></div>
+                <div class="timeline-content">
+                    <div class="label">Đã giao</div>
+                    <div class="meta">Hoàn tất</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="card">
+            <div class="order-card-title">Thông tin đơn hàng</div>
+            <div class="profile-info-row"><span class="profile-info-label">Mã đơn</span><span class="profile-info-value">#{{ order.id }}</span></div>
+            <div class="profile-info-row">
+                <span class="profile-info-label">Trạng thái</span>
+                <span class="badge {% if order.status == 'delivered' %}badge-success{% elif order.status == 'pending' %}badge-warning{% elif order.status == 'cancelled' %}badge-danger{% else %}badge-info{% endif %}">
+                    {{ order.status|default:"pending" }}
+                </span>
+            </div>
+            <div class="profile-info-row">
+                <span class="profile-info-label">Tổng tiền</span>
+                <span class="profile-info-value" style="color:var(--success);font-size:1.1rem;font-weight:900;">{{ order.total_amount|floatformat:0 }} đ</span>
+            </div>
+            {% if order.shipping_address %}<div class="profile-info-row"><span class="profile-info-label">Địa chỉ</span><span class="profile-info-value">{{ order.shipping_address }}</span></div>{% endif %}
+            {% if order.created_at %}<div class="profile-info-row"><span class="profile-info-label">Ngày đặt</span><span class="profile-info-value" style="color:var(--text-muted);">{{ order.created_at }}</span></div>{% endif %}
+        </div>
+
+        <div class="card">
+            <div class="order-card-title">Thanh toán</div>
+            {% if payments %}
+                {% for p in payments %}
+                <div class="profile-info-row"><span class="profile-info-label">Phương thức</span><span class="profile-info-value">{{ p.payment_method|default:"—" }}</span></div>
+                <div class="profile-info-row"><span class="profile-info-label">Trạng thái</span><span class="badge {% if p.status == 'completed' %}badge-success{% elif p.status == 'failed' %}badge-danger{% else %}badge-info{% endif %}">{{ p.status|default:"pending" }}</span></div>
+                {% endfor %}
+            {% else %}
+                <div style="color:var(--text-muted);">Chưa có thông tin thanh toán.</div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <div class="order-card-title">Vận chuyển</div>
+            {% if shipments %}
+                {% for s in shipments %}
+                <div class="profile-info-row"><span class="profile-info-label">Dịch vụ</span><span class="profile-info-value">{{ s.carrier|default:"standard" }}</span></div>
+                <div class="profile-info-row"><span class="profile-info-label">Trạng thái</span><span class="badge badge-info">{{ s.status|default:"pending" }}</span></div>
+                {% if s.tracking_number %}<div class="profile-info-row"><span class="profile-info-label">Tracking</span><span class="profile-info-value">{{ s.tracking_number }}</span></div>{% endif %}
+                {% endfor %}
+            {% else %}
+                <div style="color:var(--text-muted);">Chưa có thông tin vận chuyển.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>@media(max-width:900px){.order-detail-grid{grid-template-columns:1fr!important;}}</style>
+
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">😕</div>
+    <h3>Không tìm thấy đơn hàng</h3>
+    <a href="{% url 'orders' %}" class="btn btn-primary">← Quay lại</a>
+</div>
+{% endif %}
+
+{% endblock %}

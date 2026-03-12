@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Thêm sách - BookStore{% endblock %}
+{% block content %}
+
+<a href="{% url 'admin_dashboard' %}" class="back-link">← Quay lại Dashboard</a>
+
+<div class="page-header">
+    <h1>📚 Thêm sách mới</h1>
+</div>
+
+<div style="max-width:700px;">
+    <div style="background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);padding:2rem;">
+        {% if error %}
+        <div class="alert alert-error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">📖 Tên sách *</label>
+                    <input type="text" name="title" class="form-control" placeholder="Tên sách" value="{{ post.title|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">✍️ Tác giả *</label>
+                    <input type="text" name="author" class="form-control" placeholder="Tên tác giả" value="{{ post.author|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">🏷️ Danh mục</label>
+                    <select name="category" class="form-control">
+                        <option value="">-- Chọn danh mục --</option>
+                        {% for c in categories %}
+                        <option value="{{ c.name }}" {% if post.category|default:'' == c.name %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">💰 Giá (đ) *</label>
+                    <input type="number" name="price" class="form-control" placeholder="VD: 150000" min="0" value="{{ post.price|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📦 Số lượng trong kho *</label>
+                    <input type="number" name="stock" class="form-control" placeholder="VD: 50" min="0" value="{{ post.stock|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">🏢 Nhà xuất bản</label>
+                    <input type="text" name="publisher" class="form-control" placeholder="Tên NXB" value="{{ post.publisher|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📄 Số trang</label>
+                    <input type="number" name="pages" class="form-control" placeholder="VD: 320" min="1" value="{{ post.pages|default:'' }}">
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">📝 Mô tả</label>
+                    <textarea name="description" class="form-control" placeholder="Mô tả nội dung sách...">{{ post.description|default:'' }}</textarea>
+                </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;">
+                <button type="submit" class="btn btn-primary btn-lg">✅ Thêm sách</button>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

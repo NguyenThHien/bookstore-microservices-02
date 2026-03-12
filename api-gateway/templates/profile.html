@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Hồ sơ - BookStore{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>👤 Hồ sơ cá nhân</h1>
+</div>
+
+{% if customer %}
+<div class="profile-card">
+    <div style="text-align:center;margin-bottom:2rem;">
+        <div class="profile-avatar">{{ customer.name|first|upper }}</div>
+        <h2 style="font-size:1.4rem;font-weight:800;color:var(--text-light);">{{ customer.name }}</h2>
+        <p style="color:var(--text-muted);">{{ customer.email }}</p>
+        {% if customer.is_admin %}<span class="badge badge-danger">Admin</span>{% elif customer.is_staff %}<span class="badge badge-warning">Staff</span>{% else %}<span class="badge badge-info">Khách hàng</span>{% endif %}
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="profile-info-row">
+        <span class="profile-info-label">📧 Email</span>
+        <span class="profile-info-value">{{ customer.email }}</span>
+    </div>
+    {% if customer.phone %}
+    <div class="profile-info-row">
+        <span class="profile-info-label">📱 Điện thoại</span>
+        <span class="profile-info-value">{{ customer.phone }}</span>
+    </div>
+    {% endif %}
+    {% if customer.address %}
+    <div class="profile-info-row">
+        <span class="profile-info-label">📍 Địa chỉ</span>
+        <span class="profile-info-value">{{ customer.address }}{% if customer.city %}, {{ customer.city }}{% endif %}{% if customer.country %}, {{ customer.country }}{% endif %}</span>
+    </div>
+    {% endif %}
+    <div class="profile-info-row">
+        <span class="profile-info-label">📅 Ngày tham gia</span>
+        <span class="profile-info-value">{{ customer.created_at|default:"—" }}</span>
+    </div>
+
+    <div class="divider"></div>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+        <a href="{% url 'orders' %}" class="btn btn-primary btn-sm">📦 Đơn hàng của tôi</a>
+        <a href="{% url 'cart' %}" class="btn btn-outline btn-sm">🛒 Giỏ hàng</a>
+        <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Đăng xuất</a>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">😕</div>
+    <h3>Không tải được thông tin</h3>
+    <p>Vui lòng thử lại sau.</p>
+</div>
+{% endif %}
+
+{% endblock %}

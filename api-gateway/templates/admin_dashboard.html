@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - BookStore{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>⚙️ Admin Dashboard</h1>
+        <p style="color:var(--text-muted);">Quản lý toàn bộ hệ thống BookStore</p>
+    </div>
+    <a href="{% url 'add_book' %}" class="btn btn-primary">+ Thêm sách mới</a>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card purple">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value">{{ total_orders }}</div>
+        <div class="stat-label">Tổng đơn hàng</div>
+    </div>
+    <div class="stat-card green">
+        <div class="stat-icon">👥</div>
+        <div class="stat-value">{{ total_customers }}</div>
+        <div class="stat-label">Khách hàng</div>
+    </div>
+    <div class="stat-card orange">
+        <div class="stat-icon">📚</div>
+        <div class="stat-value">{{ total_books }}</div>
+        <div class="stat-label">Tổng sách</div>
+    </div>
+    <div class="stat-card red">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value">{{ total_revenue|floatformat:0 }}</div>
+        <div class="stat-label">Doanh thu (đ)</div>
+    </div>
+</div>
+
+<!-- Quick actions -->
+<div style="display:flex;gap:0.75rem;margin-bottom:2rem;flex-wrap:wrap;">
+    <a href="{% url 'add_book' %}" class="btn btn-primary btn-sm">📚 Thêm sách</a>
+    <a href="{% url 'manage_orders' %}" class="btn btn-warning btn-sm">📦 Quản lý đơn hàng</a>
+    <a href="{% url 'manage_customers' %}" class="btn btn-outline btn-sm">👥 Quản lý khách hàng</a>
+    <a href="{% url 'manage_categories' %}" class="btn btn-outline btn-sm">🏷️ Quản lý danh mục</a>
+</div>
+
+<div class="admin-grid">
+    <!-- Recent Orders -->
+    <div class="admin-section" style="grid-column: 1 / -1;">
+        <h3>📋 Đơn hàng gần đây</h3>
+        {% if orders %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders|slice:":10" %}
+                    <tr>
+                        <td><strong>#{{ order.id }}</strong></td>
+                        <td>{{ order.customer_id }}</td>
+                        <td style="color:var(--success);font-weight:700;">{{ order.total_amount|floatformat:0 }} đ</td>
+                        <td>
+                            <span class="badge {% if order.status == 'delivered' %}badge-success{% elif order.status == 'pending' %}badge-warning{% elif order.status == 'cancelled' %}badge-danger{% else %}badge-info{% endif %}">
+                                {{ order.status|default:"pending" }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'update_order_status' order.id %}" class="btn btn-sm btn-outline">Cập nhật</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding:2rem;">
+            <div class="empty-icon">📭</div>
+            <p>Chưa có đơn hàng nào.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Books Management -->
+    <div class="admin-section" style="grid-column: 1 / -1;">
+        <h3>📚 Quản lý sách</h3>
+        {% if books %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên sách</th>
+                        <th>Tác giả</th>
+                        <th>Giá</th>
+                        <th>Kho</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                    {% if book.id %}
+                    <tr>
+                        <td style="color:var(--text-muted);">#{{ book.id }}</td>
+                        <td><strong>{{ book.title|truncatechars:35 }}</strong></td>
+                        <td>{{ book.author }}</td>
+                        <td style="color:var(--success);font-weight:600;">{{ book.price|floatformat:0 }} đ</td>
+                        <td>
+                            {% if book.stock == 0 %}
+                            <span class="badge badge-danger">Hết</span>
+                            {% elif book.stock <= 5 %}
+                            <span class="badge badge-warning">{{ book.stock }}</span>
+                            {% else %}
+                            <span class="badge badge-success">{{ book.stock }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="display:flex;gap:6px;">
+                            <a href="{% url 'edit_book' book.id %}" class="btn btn-sm btn-warning">✏️</a>
+                            <form method="post" action="{% url 'delete_book' book.id %}" onsubmit="return confirm('Xóa sách này?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding:2rem;">
+            <p>Chưa có sách nào. <a href="{% url 'add_book' %}">Thêm sách ngay</a></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Category summary -->
+    <div class="admin-section" style="grid-column: 1 / -1;">
+        <h3>🏷️ Danh mục sách</h3>
+        <p style="margin-bottom:0.75rem;color:var(--text-muted);">
+            Tổng danh mục: <strong>{{ total_categories|default:0 }}</strong> —
+            Đang sử dụng: <strong>{{ active_categories|length|default:0 }}</strong>
+        </p>
+        {% if active_categories %}
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            {% for c in active_categories %}
+            <span class="badge badge-info">{{ c.name }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color:var(--text-muted);font-size:0.9rem;">Chưa có danh mục đang sử dụng.</p>
+        {% endif %}
+        <div style="margin-top:1rem;">
+            <a href="{% url 'manage_categories' %}" class="btn btn-outline btn-sm">Quản lý chi tiết</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

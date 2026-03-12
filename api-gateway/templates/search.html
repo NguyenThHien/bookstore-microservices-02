@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Tìm kiếm: {{ query }} - BookStore{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>🔍 Kết quả tìm kiếm</h1>
+        {% if query %}<p style="color:var(--text-muted);">{{ books|length }} kết quả cho "<strong style="color:var(--text);">{{ query }}</strong>"</p>{% endif %}
+    </div>
+</div>
+
+<div style="margin-bottom:2rem;">
+    <form method="get" action="{% url 'search' %}" style="display:flex;gap:0.75rem;max-width:500px;">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Tìm kiếm sách, tác giả..." autofocus>
+        <button type="submit" class="btn btn-primary">Tìm</button>
+    </form>
+</div>
+
+{% if books %}
+<div class="books-grid">
+    {% for book in books %}
+    {% if book.id %}
+    <div class="book-card">
+        <a href="{% url 'book_detail' book.id %}"><div class="book-cover">📖</div></a>
+        <div class="book-card-body">
+            <a href="{% url 'book_detail' book.id %}" class="book-title" style="color:var(--text-light);">{{ book.title }}</a>
+            <div class="book-author">✍️ {{ book.author }}</div>
+            {% if book.category %}<span class="book-category">{{ book.category }}</span>{% endif %}
+            <div class="book-price">{{ book.price|floatformat:0 }} đ</div>
+            <div class="book-actions">
+                <a href="{% url 'book_detail' book.id %}" class="btn btn-outline btn-sm">Chi tiết</a>
+                {% if book.stock > 0 %}
+                <form method="post" action="{% url 'add_to_cart' %}" style="flex:1;">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-primary btn-sm" style="width:100%;">🛒 Thêm</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% elif query %}
+<div class="empty-state">
+    <div class="empty-icon">🔍</div>
+    <h3>Không tìm thấy kết quả</h3>
+    <p>Không có sách nào khớp với "<strong>{{ query }}</strong>". Hãy thử từ khóa khác.</p>
+    <a href="{% url 'books' %}" class="btn btn-outline">← Xem tất cả sách</a>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">💡</div>
+    <h3>Nhập từ khóa để tìm kiếm</h3>
+    <p>Tìm theo tên sách, tác giả, hoặc nội dung mô tả.</p>
+</div>
+{% endif %}
+
+{% endblock %}

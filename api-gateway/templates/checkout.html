@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Thanh toán - BookStore{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>🚀 Thanh toán đơn hàng</h1>
+</div>
+
+{% if error %}
+<div class="alert alert-error">⚠️ {{ error }}</div>
+{% endif %}
+
+{% if items %}
+<div style="display:grid;grid-template-columns:1fr 340px;gap:2rem;align-items:start;" class="cart-layout">
+    <div>
+        <h2 class="section-title">📋 Thông tin giao hàng</h2>
+        <form method="post" style="background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);padding:1.5rem;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">📍 Địa chỉ giao hàng</label>
+                <textarea name="address" class="form-control" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">💳 Phương thức thanh toán</label>
+                <select name="payment_method" class="form-control">
+                    <option value="cod">💵 Thanh toán khi nhận hàng (COD)</option>
+                    <option value="card">💳 Thẻ tín dụng / Debit</option>
+                    <option value="bank_transfer">🏦 Chuyển khoản ngân hàng</option>
+                    <option value="momo">📱 Ví MoMo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">🚚 Phương thức vận chuyển</label>
+                <select name="shipping_method" class="form-control">
+                    <option value="standard">Standard Shipping (5-7 days) - 5.00$</option>
+                    <option value="express">Express Shipping (2-3 days) - 15.00$</option>
+                    <option value="next_day">Next Day Delivery (1 day) - 25.00$</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg">✅ Xác nhận đặt hàng</button>
+        </form>
+    </div>
+
+    <div style="position:sticky;top:80px;">
+        <div style="background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);padding:1.5rem;">
+            <h3 style="font-size:1rem;font-weight:700;color:var(--text-light);margin-bottom:1rem;">📦 Sản phẩm đặt hàng</h3>
+            {% for item in items %}
+            <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--card-border);font-size:0.85rem;">
+                <span style="color:var(--text-muted);">📖 x{{ item.quantity }}</span>
+                <span>{{ item.price|floatformat:0 }} đ</span>
+            </div>
+            {% endfor %}
+            <div class="divider" style="margin:1rem 0;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-weight:700;color:var(--text-light);">Tổng cộng</span>
+                <span style="font-size:1.3rem;font-weight:800;color:var(--success);">{{ total_amount|floatformat:0 }} đ</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>@media(max-width:768px){.cart-layout{grid-template-columns:1fr !important;}}</style>
+
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">🛒</div>
+    <h3>Giỏ hàng trống</h3>
+    <p>Bạn chưa có sản phẩm nào để thanh toán.</p>
+    <a href="{% url 'books' %}" class="btn btn-primary">📚 Mua sắm ngay</a>
+</div>
+{% endif %}
+
+{% endblock %}

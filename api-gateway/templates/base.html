@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BookStore{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260312">
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="{% url 'home' %}" class="logo">BookStore</a>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Trang chủ</a></li>
+                    <li><a href="{% url 'books' %}">Sách</a></li>
+                    <li>
+                        <form method="get" action="{% url 'search' %}" class="nav-search">
+                            <input type="text" name="q" placeholder="Tìm sách..." value="{{ request.GET.q|default:'' }}">
+                            <button type="submit">Search</button>
+                        </form>
+                    </li>
+                    {% if request.session.customer_id %}
+                        <li><a href="{% url 'cart' %}">Giỏ hàng</a></li>
+                        <li><a href="{% url 'orders' %}">Đơn hàng</a></li>
+                        <li><a href="{% url 'profile' %}">{{ request.session.customer_name }}</a></li>
+                        {% if request.session.is_admin or request.session.is_staff %}
+                            <li><a href="{% url 'admin_dashboard' %}" class="admin-link">Admin</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'logout' %}">Đăng xuất</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Đăng nhập</a></li>
+                        <li><a href="{% url 'register' %}">Đăng ký</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2026 BookStore — Thư viện sách trực tuyến hàng đầu Việt Nam</p>
+    </footer>
+</body>
+</html>

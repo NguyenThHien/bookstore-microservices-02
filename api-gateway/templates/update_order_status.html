@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Cập nhật trạng thái - BookStore{% endblock %}
+{% block content %}
+
+<a href="{% url 'manage_orders' %}" class="back-link">← Quản lý đơn hàng</a>
+
+<div class="page-header">
+    <h1>✏️ Cập nhật đơn hàng #{{ order.id }}</h1>
+</div>
+
+<div style="max-width:480px;">
+    <div style="background:var(--bg2);border:1px solid var(--card-border);border-radius:var(--radius);padding:2rem;">
+        <div style="margin-bottom:1.5rem;">
+            <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">Trạng thái hiện tại</div>
+            <span class="badge {% if order.status == 'delivered' %}badge-success{% elif order.status == 'pending' %}badge-warning{% elif order.status == 'cancelled' %}badge-danger{% else %}badge-info{% endif %}" style="font-size:0.9rem;padding:6px 14px;">
+                {{ order.status|default:"pending" }}
+            </span>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">📋 Trạng thái mới</label>
+                <select name="status" class="form-control">
+                    <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>⏳ Chờ xác nhận</option>
+                    <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>✅ Đã xác nhận</option>
+                    <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>🚚 Đang giao hàng</option>
+                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>📬 Đã giao thành công</option>
+                    <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>❌ Đã hủy</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:0.75rem;">
+                <button type="submit" class="btn btn-primary">💾 Cập nhật</button>
+                <a href="{% url 'manage_orders' %}" class="btn btn-outline">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

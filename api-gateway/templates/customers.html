@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý khách hàng - BookStore{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>👥 Quản lý khách hàng</h1>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline btn-sm">← Dashboard</a>
+</div>
+
+{% if customers %}
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Ngày tham gia</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td style="color:var(--text-muted);">#{{ customer.id }}</td>
+                <td><strong>{{ customer.name }}</strong></td>
+                <td>{{ customer.email }}</td>
+                <td>
+                    {% if customer.is_admin %}<span class="badge badge-danger">Admin</span>
+                    {% elif customer.is_staff %}<span class="badge badge-warning">Staff</span>
+                    {% else %}<span class="badge badge-info">Khách hàng</span>{% endif %}
+                </td>
+                <td style="color:var(--text-muted);font-size:0.85rem;">{{ customer.created_at|default:"—" }}</td>
+                <td><a href="{% url 'customer_detail_admin' customer.id %}" class="btn btn-sm btn-outline">Xem</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">👥</div>
+    <h3>Chưa có khách hàng nào</h3>
+</div>
+{% endif %}
+
+{% endblock %}

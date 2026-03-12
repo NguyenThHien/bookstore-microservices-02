@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Đơn hàng của tôi - BookStore{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>📦 Đơn hàng của tôi</h1>
+</div>
+
+{% if orders %}
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Mã đơn</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Ngày đặt</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>#{{ order.id }}</strong></td>
+                <td style="color:var(--success);font-weight:700;">{{ order.total_amount|floatformat:0 }} đ</td>
+                <td>
+                    <span class="badge {% if order.status == 'delivered' %}badge-success{% elif order.status == 'pending' %}badge-warning{% elif order.status == 'cancelled' %}badge-danger{% else %}badge-info{% endif %}">
+                        {% if order.status == 'pending' %}⏳ Chờ xác nhận
+                        {% elif order.status == 'confirmed' %}✅ Đã xác nhận
+                        {% elif order.status == 'shipped' %}🚚 Đang giao
+                        {% elif order.status == 'delivered' %}📬 Đã giao
+                        {% elif order.status == 'cancelled' %}❌ Đã hủy
+                        {% else %}{{ order.status }}{% endif %}
+                    </span>
+                </td>
+                <td style="color:var(--text-muted);">{{ order.created_at|default:"—" }}</td>
+                <td>
+                    {% if order.id %}
+                    <a href="{% url 'order_status' order.id %}" class="btn btn-sm btn-outline">Xem chi tiết</a>
+                    {% else %}
+                    <span class="btn btn-sm" style="cursor:not-allowed;opacity:0.6;background:transparent;border:1px solid var(--card-border);">N/A</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>Chưa có đơn hàng nào</h3>
+    <p>Bạn chưa đặt đơn hàng nào. Hãy mua sắm ngay!</p>
+    <a href="{% url 'books' %}" class="btn btn-primary">📚 Khám phá sách</a>
+</div>
+{% endif %}
+
+{% endblock %}

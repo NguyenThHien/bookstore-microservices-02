@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Chi tiết khách hàng - BookStore{% endblock %}
+{% block content %}
+
+<a href="{% url 'manage_customers' %}" class="back-link">← Quản lý khách hàng</a>
+
+<div class="page-header">
+    <h1>👤 Chi tiết khách hàng</h1>
+</div>
+
+{% if customer %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;" class="order-layout">
+    <div class="profile-card" style="max-width:100%;margin:0;">
+        <div style="text-align:center;margin-bottom:1.5rem;">
+            <div class="profile-avatar">{{ customer.name|first|upper }}</div>
+            <h2 style="font-size:1.2rem;font-weight:800;color:var(--text-light);">{{ customer.name }}</h2>
+            {% if customer.is_admin %}<span class="badge badge-danger">Admin</span>{% elif customer.is_staff %}<span class="badge badge-warning">Staff</span>{% else %}<span class="badge badge-info">Khách hàng</span>{% endif %}
+        </div>
+        <div class="profile-info-row"><span class="profile-info-label">📧 Email</span><span class="profile-info-value">{{ customer.email }}</span></div>
+        {% if customer.phone %}<div class="profile-info-row"><span class="profile-info-label">📱 SĐT</span><span class="profile-info-value">{{ customer.phone }}</span></div>{% endif %}
+        {% if customer.address %}<div class="profile-info-row"><span class="profile-info-label">📍 Địa chỉ</span><span class="profile-info-value">{{ customer.address }}</span></div>{% endif %}
+        {% if customer.city %}<div class="profile-info-row"><span class="profile-info-label">🏙️ Thành phố</span><span class="profile-info-value">{{ customer.city }}</span></div>{% endif %}
+        <div class="profile-info-row"><span class="profile-info-label">📅 Tham gia</span><span class="profile-info-value" style="color:var(--text-muted);">{{ customer.created_at|default:"—" }}</span></div>
+    </div>
+
+    <div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--text-light);margin-bottom:1rem;">📦 Đơn hàng gần đây</h3>
+        {% if orders %}
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            {% for order in orders|slice:":5" %}
+            <div style="background:var(--bg2);border:1px solid var(--card-border);border-radius:12px;padding:1rem;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-weight:700;color:var(--text-light);">#{{ order.id }}</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);">{{ order.created_at|default:"—" }}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="color:var(--success);font-weight:700;">{{ order.total_amount|floatformat:0 }} đ</div>
+                    <span class="badge {% if order.status == 'delivered' %}badge-success{% elif order.status == 'pending' %}badge-warning{% else %}badge-info{% endif %}">{{ order.status|default:"pending" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding:2rem;">
+            <div class="empty-icon">📭</div>
+            <p>Khách hàng này chưa có đơn hàng nào.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>@media(max-width:768px){.order-layout{grid-template-columns:1fr!important;}}</style>
+{% else %}
+<div class="empty-state"><div class="empty-icon">😕</div><h3>Không tìm thấy khách hàng</h3></div>
+{% endif %}
+
+{% endblock %}

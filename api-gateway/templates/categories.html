@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý danh mục - BookStore{% endblock %}
+{% block content %}
+
+<a href="{% url 'admin_dashboard' %}" class="back-link">← Quay lại Dashboard</a>
+
+<div class="page-header">
+    <div>
+        <h1>Danh mục sách</h1>
+        <p>Quản lý các nhóm sách chính dùng cho form thêm/sửa sách.</p>
+    </div>
+</div>
+
+<div class="card">
+    {% if message %}
+    <div class="alert alert-info">{{ message }}</div>
+    {% endif %}
+
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem;">
+        <form method="post" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;flex:1;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div class="form-group" style="margin:0;min-width:220px;flex:1;">
+                <label class="form-label">Tên danh mục</label>
+                <input name="name" class="form-control" placeholder="VD: Lập trình" required>
+            </div>
+            <div class="form-group" style="margin:0;min-width:260px;flex:2;">
+                <label class="form-label">Mô tả</label>
+                <input name="description" class="form-control" placeholder="Mô tả ngắn">
+            </div>
+            <button class="btn btn-primary" type="submit">+ Thêm danh mục</button>
+        </form>
+    </div>
+
+    {% if categories %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên danh mục</th>
+                    <th>Mô tả</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in categories %}
+                <tr>
+                    <td style="color:var(--text-muted);">#{{ c.id }}</td>
+                    <td>
+                        <form method="post" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="category_id" value="{{ c.id }}">
+                            <input type="hidden" name="is_active" value="{% if c.is_active %}1{% else %}0{% endif %}">
+                            <input name="name" class="form-control" value="{{ c.name }}" style="min-width:160px;">
+                    </td>
+                    <td style="max-width:320px;">
+                            <input name="description" class="form-control" value="{{ c.description }}" style="min-width:260px;">
+                    </td>
+                    <td>
+                        {% if c.is_active %}
+                        <span class="badge badge-success">Đang dùng</span>
+                        {% else %}
+                        <span class="badge badge-warning">Ẩn</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                            <button class="btn btn-outline btn-sm" type="submit">Lưu</button>
+                        </form>
+
+                        <form method="post" style="display:inline-block;margin-right:4px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="category_id" value="{{ c.id }}">
+                            {% if c.is_active %}
+                            <input type="hidden" name="action" value="deactivate">
+                            <button class="btn btn-outline btn-sm" type="submit">Ẩn</button>
+                            {% else %}
+                            <input type="hidden" name="action" value="activate">
+                            <button class="btn btn-primary btn-sm" type="submit">Hiện</button>
+                            {% endif %}
+                        </form>
+
+                        <form method="post" style="display:inline-block;" onsubmit="return confirm('Xóa danh mục này?')">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="category_id" value="{{ c.id }}">
+                            <button class="btn btn-danger btn-sm" type="submit">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🏷️</div>
+        <h3>Chưa có danh mục nào</h3>
+        <p>Danh mục được seed tự động. Bạn cũng có thể thêm qua API catalog-service.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+

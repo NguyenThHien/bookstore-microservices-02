@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Đăng nhập - BookStore{% endblock %}
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div style="text-align:center;margin-bottom:2rem;">
+            <div style="font-size:3rem;margin-bottom:0.5rem;">🔐</div>
+            <h1 class="auth-title">Đăng nhập</h1>
+            <p class="auth-subtitle">Chào mừng trở lại! Vui lòng nhập thông tin</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="email">📧 Email</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="email@example.com" required autofocus>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">🔒 Mật khẩu</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:0.5rem;">
+                Đăng nhập →
+            </button>
+        </form>
+
+        <div class="auth-link">
+            Chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký ngay</a>
+        </div>
+
+        <div class="auth-demo">
+            <strong>🧪 Tài khoản demo:</strong><br>
+            Admin: <code>admin@bookstore.com</code> / <code>admin123</code><br>
+            User: <code>user@test.com</code> / <code>user123</code>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

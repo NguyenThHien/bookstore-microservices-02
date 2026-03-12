@@ -1,0 +1,40 @@
+from django.contrib import admin
+from django.urls import path
+from .views import (
+    home, login, logout, register, books, add_book, cart, add_to_cart,
+    profile, search_books, book_detail, place_order, order_status,
+    customer_orders, admin_dashboard, edit_book, delete_book,
+    manage_orders, manage_customers, customer_detail_admin, update_order_status,
+    rate_book,
+    update_cart_item, delete_cart_item,
+    manage_categories,
+)
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', home, name='home'),
+    path('login/', login, name='login'),
+    path('logout/', logout, name='logout'),
+    path('register/', register, name='register'),
+    path('books/', books, name='books'),
+    path('books/<int:book_id>/', book_detail, name='book_detail'),
+    path('books/<int:book_id>/rate/', rate_book, name='rate_book'),
+    path('search/', search_books, name='search'),
+    path('add-book/', add_book, name='add_book'),
+    path('cart/', cart, name='cart'),
+    path('add-to-cart/', add_to_cart, name='add_to_cart'),
+    path('cart/item/<int:item_id>/update/', update_cart_item, name='update_cart_item'),
+    path('cart/item/<int:item_id>/delete/', delete_cart_item, name='delete_cart_item'),
+    path('checkout/', place_order, name='checkout'),
+    path('order-status/<int:order_id>/', order_status, name='order_status'),
+    path('orders/', customer_orders, name='orders'),
+    path('profile/', profile, name='profile'),
+    path('admin-dashboard/', admin_dashboard, name='admin_dashboard'),
+    path('admin-dashboard/edit-book/<int:book_id>/', edit_book, name='edit_book'),
+    path('admin-dashboard/delete-book/<int:book_id>/', delete_book, name='delete_book'),
+    path('admin-dashboard/orders/', manage_orders, name='manage_orders'),
+    path('admin-dashboard/orders/<int:order_id>/status/', update_order_status, name='update_order_status'),
+    path('admin-dashboard/customers/', manage_customers, name='manage_customers'),
+    path('admin-dashboard/customers/<int:customer_id>/', customer_detail_admin, name='customer_detail_admin'),
+    path('admin-dashboard/categories/', manage_categories, name='manage_categories'),
+]
